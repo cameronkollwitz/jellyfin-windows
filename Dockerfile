@@ -1,9 +1,14 @@
 # Windows Server Core 2004 (10.0.19041.450)
 FROM mcr.microsoft.com/windows/servercore:2004
-
 # Additional Options - but not used at the moment
 #FROM mcr.microsoft.com/windows/servercore:ltsc2019
 #FROM windows/servercore/insider
+
+LABEL Maintainer="Cameron Kollwitz <cameron@kollwitz.us>"
+LABEL Description="Jellyfin Media Player in Windows Container"
+LABEL Repository="https://hub.docker.com/r/cameronkollwitz/jellyfin-windows"
+LABEL Source="https://github.com/cameronkollwitz/jellyfin-windows"
+LABEL Version="1.0"
 
 # Jellyfin Version
 ENV JELLYFIN_VERSION 10.6.4
@@ -20,7 +25,7 @@ RUN cd C:\ && curl -fSLo jellyfin.zip https://repo.jellyfin.org/releases/server/
 # Expose default ports
 EXPOSE 8096/tcp 8920/tcp 1900/udp
 
-# Optional UDP
+# Local Server Discovery (UDP)
 #EXPOSE 7359/udp
 
 # Define the volume
