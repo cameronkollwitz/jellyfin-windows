@@ -68,6 +68,9 @@ services:
         #traefik.http.routers.jellyfin-rtr.middlewares: "chain-basic-auth@file" # .htpasswd Authentication
         traefik.http.routers.jellyfin-rtr.middlewares: "chain-no-auth@file" # No Authentication
         #traefik.http.routers.jellyfin-rtr.middlewares: "chain-oauth@file" # Traefik-Forward-Auth
+      placement:
+        # Restrict placement of the service to Windows nodes only
+        constraints: [node.platform.os == windows]
       restart_policy:
         condition: any
     environment:
@@ -96,11 +99,7 @@ services:
         published: 37359
         protocol: udp
         mode: host # Host mode is REQUIRED if you plan on using DNLA
-    volumes:
-      - type: bind
-        source: /etc/localtime
-        target: /etc/localtime
-        read_only: true
+    #volumes:
       #- type: bind
       #  source: c:/path/to/config
       #  target: c:/jellyfin/config
