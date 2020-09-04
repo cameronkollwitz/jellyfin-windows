@@ -17,4 +17,7 @@ docker run -itd --name jellyfin -p 38096:8096 -p 38920:8920 -p 31900:1900 \
 
 ## How to Build
 
-TBW.
+1. Clone the repository
+2. `Set-Location` to the repository directory
+3. Execute: `docker build .`
+4. Once finished building, you can now launch the container with the ID that is supplied.
