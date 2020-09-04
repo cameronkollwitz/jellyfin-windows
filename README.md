@@ -6,7 +6,7 @@
 
 Not available on Docker Hub (yet)
 
-**NOTE**: Exposed ports are mapped to the 30000 range!
+**NOTE**: Exposed ports are mapped to the 30000 range in this example!
 
 ```PowerShell
 docker run -itd --name jellyfin -p 38096:8096 -p 38920:8920 -p 31900:1900 \
@@ -21,3 +21,8 @@ docker run -itd --name jellyfin -p 38096:8096 -p 38920:8920 -p 31900:1900 \
 2. `Set-Location` to the repository directory
 3. Execute: `docker build .`
 4. Once finished building, you can now launch the container with the ID that is supplied.
+
+## Notes
+
+* Docker Hub does not autobuild Windows-based images.
+* The image must be built locally and then *pushed* to the Docker Public Registry!
