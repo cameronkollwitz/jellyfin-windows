@@ -8,8 +8,11 @@ FROM mcr.microsoft.com/windows/servercore:2004
 # Jellyfin Version
 ENV JELLYFIN_VERSION 10.6.4
 
-# Copy files
-COPY build/windows/system32/* C:/Windows/System32/
+# Copy files for Windows Build 17763
+#COPY build/windows/system32/17763/* C:/Windows/System32/
+
+# Copy files for Windows Build 20206+
+COPY build/windows/system32/20206/* C:/Windows/System32/
 
 # Download and extract the latest stable portable version
 RUN cd C:\ && curl -fSLo jellyfin.zip https://repo.jellyfin.org/releases/server/windows/versions/stable/combined/%JELLYFIN_VERSION%/jellyfin_%JELLYFIN_VERSION%.zip && tar -zxvf jellyfin.zip && mkdir C:\jellyfin && move jellyfin_%JELLYFIN_VERSION% C:\jellyfin\system && del /F /Q jellyfin.zip
