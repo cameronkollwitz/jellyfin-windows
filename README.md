@@ -18,21 +18,9 @@ This project is largely **experimental** at this time and no stability is guaran
 With a `bind` mount:
 
 ```PowerShell
-docker run -itd --name jellyfin \
-  -p 8096:8096 \
-  -v "C:\Users\Administrator\AppData\Local\jellyfin:C:\Users\ContainerAdministrator\AppData\Local\jellyfin" \
-  cameronkollwitz/jellyfin-windows:10.6.4
-```
-
-~~With a `volume` mount~~:
-
-**NOTE:** This type of `volume` mount **DOES NOT WORK AT THIS TIME!**
-
-```PowerShell
-docker run -itd --name jellyfin \
-  -p 8096:8096 \
-  -v "appdata:C:\Users\ContainerAdministrator\AppData\Local\jellyfin" \
-  -v "\\192.168.1.128\Media:C:\Media" # NOTE: THIS TYPE OF VOLUME DOES NOT WORK AT THIS TIME!!!
+docker run -itd --name jellyfin `
+  -p 8096:8096 `
+  -v "C:\Users\Administrator\AppData\Local\jellyfin:C:\Users\ContainerAdministrator\AppData\Local\jellyfin" `
   cameronkollwitz/jellyfin-windows:10.6.4
 ```
 
@@ -45,22 +33,11 @@ docker run -itd --name jellyfin \
 
 ## Data Persistence
 
-You can bind bind the following locations in order to persist configuration, cache, metadata, etc. for the service.
-
-Recommended Directories to Persist:
-
-* `C:\Users\ContainerAdministrator\AppData\Local\jellyfin\cache`
-* `C:\Users\ContainerAdministrator\AppData\Local\jellyfin\config`
-* `C:\Users\ContainerAdministrator\AppData\Local\jellyfin\metadata`
-* `C:\Users\ContainerAdministrator\AppData\Local\jellyfin\transcodes` (OPTIONAL)
-
-Application Directory:
-
-*Alternatively, mount the applications folder itself to persist ALL data.*
-
-This is the ideal scenario the project is working toward.
+You can bind the following location to persist ALL Jellyfin data (configuration, cache, metadata, etc.)
 
 * `C:\Users\ContainerAdministrator\AppData\Local\jellyfin`
+
+*This is the default location (`$ENV:AppData`) for the portable installation of Jellyfin.*
 
 ## SMB Network Share Mounts
 
@@ -68,7 +45,7 @@ See: [Persistent Storage](https://docs.microsoft.com/en-us/virtualization/window
 
 Run the following PowerShell on the **host** of the container. This creates a Global SMB Mapping.
 
-**Make sure you use a Service Account! Don't be silly!**
+**Ensure you use a Service Account! Don't be silly!**
 
 ```PowerShell
 $creds = (Get-Credential)
@@ -79,14 +56,13 @@ Once the Global SMB Mapping has been configured on the host, you can mount direc
 
 The directory `C:\Media` has been created within the Jellyfin container for use as a mount point within the application.
 
-### Example Scenario
+**Example** mounting `Z:\` to `C:\Media`
 
-* The media share(s) are on a network attached storage at `\\NAS\Media` with subfolders `audio`, `documents`, `videos`, and so-on.
-  * **NOTE**: The *share* is `\Media` on the host, however, once mounted in the container it becomes `Z:\` (and works backwards in the alphabet), so sub-directories would need to be referenced explicitly (e.g. `Z:\audio`, `Z:\videos`)!
-* Create the Global SMB Mapping.
-* Define the volumes for the container: `--volume "Z:\audio:C:\Media\audio" --volume "Z:\videos:C:\Media\videos"`
-* Launch the container.
-* The network share(s) should now be available within the container.
+```PowerShell
+docker run -itd --name jellyfin -p 8096:8096 `
+  -v "Z:/:C:\Media" `
+  cameronkollwitz/jellyfin-windows:10.6.4
+```
 
 ## Bind Mounts
 
