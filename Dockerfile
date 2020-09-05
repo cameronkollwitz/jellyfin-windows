@@ -22,7 +22,7 @@ ENV JELLYFIN_VERSION 10.6.4
 COPY build/windows/system32/20206/* C:/Windows/System32/
 
 # Download and extract the latest stable portable version
-RUN cd C:\ && curl -fSLo jellyfin.zip https://repo.jellyfin.org/releases/server/windows/versions/stable/combined/%JELLYFIN_VERSION%/jellyfin_%JELLYFIN_VERSION%.zip && tar -zxvf jellyfin.zip && mkdir C:\Jellyfin && move jellyfin_%JELLYFIN_VERSION% C:\Jellyfin\App && del /F /Q jellyfin.zip && mkdir C:\Jellyfin\AppData
+RUN cd C:\ && curl -fSLo jellyfin.zip https://repo.jellyfin.org/releases/server/windows/versions/stable/combined/%JELLYFIN_VERSION%/jellyfin_%JELLYFIN_VERSION%.zip && tar -zxvf jellyfin.zip && mkdir C:\Jellyfin && move jellyfin_%JELLYFIN_VERSION% C:\Jellyfin\App && del /F /Q jellyfin.zip && mkdir C:\Jellyfin\AppData && mkdir C:\Media
 
 # Create Docker Volume Directories
 #RUN mkdir C:\App && mkdir && mkdir C:\Temp
