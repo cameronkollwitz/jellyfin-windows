@@ -1,5 +1,7 @@
+FROM mcr.microsoft.com/windows/nanoserver:2004-amd64
+
 # Windows Server Core 2004 (10.0.19041.450)
-FROM mcr.microsoft.com/windows/servercore:2004
+#FROM mcr.microsoft.com/windows/servercore:2004
 # Additional Options - but not used at the moment
 #FROM mcr.microsoft.com/windows/servercore:ltsc2019
 #FROM windows/servercore/insider
@@ -13,6 +15,9 @@ LABEL Version="1.0"
 # Jellyfin Version
 ENV JELLYFIN_VERSION 10.6.4
 
+# Create new directories
+RUN mkdir C:\Jellyfin && mkdir C:\Jellyfin\AppData && mkdir C:\Media && mkdir C:\Scripts && mkdir C:\Temp
+
 # Copy files for Windows Build 17763
 #COPY build/windows/system32/17763/* C:/Windows/System32/
 
@@ -20,19 +25,27 @@ ENV JELLYFIN_VERSION 10.6.4
 COPY build/windows/system32/20206/* C:/Windows/System32/
 
 # Download and extract the latest stable portable version
-RUN cd C:\ && curl -fSLo jellyfin.zip https://repo.jellyfin.org/releases/server/windows/versions/stable/combined/%JELLYFIN_VERSION%/jellyfin_%JELLYFIN_VERSION%.zip && tar -zxvf jellyfin.zip && mkdir C:\jellyfin && move jellyfin_%JELLYFIN_VERSION% C:\jellyfin\system && del /F /Q jellyfin.zip
+RUN cd C:\ && curl -fSLo jellyfin.zip https://repo.jellyfin.org/releases/server/windows/versions/stable/combined/%JELLYFIN_VERSION%/jellyfin_%JELLYFIN_VERSION%.zip && tar -zxvf jellyfin.zip && move jellyfin_%JELLYFIN_VERSION% C:\Jellyfin\System && del /F /Q jellyfin.zip
 
-# Expose default ports
+# HTTP, HTTPS, UPNP
 EXPOSE 8096/tcp 8920/tcp 1900/udp
 
-# Local Server Discovery (UDP)
+# DNLA Server Discovery (UDP)
 #EXPOSE 7359/udp
 
-# Define the volume
+# Define the volumes
+VOLUME [ "C:/Jellyfin/AppData" ]
+
+VOLUME [ "C:/Media" ]
+
+VOLUME [ "C:/Scripts" ]
+
+VOLUME [ "C:/Temp" ]
+
 VOLUME [ "C:/Users/ContainerAdministrator/AppData/Local/jellyfin" ]
 
 # Set working directory
-WORKDIR C:/jellyfin/system
+WORKDIR C:/Jellyfin/System
 
 # Start the service
 CMD ["jellyfin.exe" , "--service" ]
