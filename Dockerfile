@@ -21,31 +21,30 @@ ENV JELLYFIN_VERSION 10.6.4
 # Copy files for Windows Build 20206+
 COPY build/windows/system32/20206/* C:/Windows/System32/
 
-# Create new directories
-RUN mkdir C:\Scripts && mkdir C:\Temp && mkdir C:\App
-
 # Download and extract the latest stable portable version
-RUN cd C:\ && curl -fSLo jellyfin.zip https://repo.jellyfin.org/releases/server/windows/versions/stable/combined/%JELLYFIN_VERSION%/jellyfin_%JELLYFIN_VERSION%.zip && tar -zxvf jellyfin.zip && mkdir C:\jellyfin && move jellyfin_%JELLYFIN_VERSION% C:\jellyfin\system && del /F /Q jellyfin.zip && mkdir C:\jellyfin\AppData
+RUN cd C:\ && curl -fSLo jellyfin.zip https://repo.jellyfin.org/releases/server/windows/versions/stable/combined/%JELLYFIN_VERSION%/jellyfin_%JELLYFIN_VERSION%.zip && tar -zxvf jellyfin.zip && mkdir C:\Jellyfin && move jellyfin_%JELLYFIN_VERSION% C:\Jellyfin\System && del /F /Q jellyfin.zip && mkdir C:\Jellyfin\AppData
 
-# Copy files for Windows Build 20206+
-COPY build/scripts/* C:/Scripts/
-COPY build/temp/* C:/Temp/
+# Create Docker Volume Directories
+RUN mkdir C:\App && mkdir C:\Scripts && mkdir C:\Temp
 
 # HTTP, HTTPS, UPNP
 EXPOSE 8096/tcp 8920/tcp 1900/udp
 # DNLA Server Discovery (UDP)
 #EXPOSE 7359/udp
 
-# Define Volumes
-VOLUME [ "C:/App" ]
+# Define Docker Volumes
 VOLUME [ "C:/Users/ContainerAdministrator/AppData/Local/jellyfin" ]
+
+VOLUME [ "C:/App" ]
 VOLUME [ "C:/Jellyfin/AppData" ]
 #VOLUME [ "C:/Media" ]
 VOLUME [ "C:/Scripts" ]
 VOLUME [ "C:/Temp" ]
+COPY build/scripts/* C:/Scripts/
+COPY build/temp/* C:/Temp/
 
 # Set working directory
-WORKDIR C:/jellyfin/system
+WORKDIR C:/Jellyfin/System
 
 # Start the service
 CMD ["jellyfin.exe" , "--service" ]
