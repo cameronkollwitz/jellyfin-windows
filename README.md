@@ -62,6 +62,32 @@ This is the ideal scenario the project is working toward.
 
 * `C:\Users\ContainerAdministrator\AppData\Local\jellyfin`
 
+## SMB Network Share Mounts
+
+See: [Persistent Storage](https://docs.microsoft.com/en-us/virtualization/windowscontainers/manage-containers/persistent-storage)
+
+Run the following PowerShell on the **host** of the container. This creates a Global SMB Mapping.
+
+**Make sure you use a Service Account! Don't be silly!**
+
+```PowerShell
+$creds = (Get-Credential)
+New-SmbGlobalMapping -RemotePath \\UNC\Path\To\Media -Credential $creds -LocalPath Z:
+```
+
+Once the Global SMB Mapping has been configured on the host, you can mount directly to the container with the `--volumes` option.
+
+The directory `C:\Media` has been created within the Jellyfin container for use as a mount point within the application.
+
+### Example Scenario
+
+* The media share(s) are on a network attached storage at `\\NAS\Media` with subfolders `audio`, `documents`, `videos`, and so-on.
+  * **NOTE**: The *share* is `\Media` on the host, however, once mounted in the container it becomes `Z:\` (and works backwards in the alphabet), so sub-directories would need to be referenced explicitly (e.g. `Z:\audio`, `Z:\videos`)!
+* Create the Global SMB Mapping.
+* Define the volumes for the container: `--volume "Z:\audio:C:\Media\audio" --volume "Z:\videos:C:\Media\videos"`
+* Launch the container.
+* The network share(s) should now be available within the container.
+
 ## Bind Mounts
 
 *Havin' issues with this one right now. Feel free to create a PR if you have ideas!*
