@@ -2,8 +2,8 @@
 
 # Author:     Cameron Kollwitz <cameron@kollwitz.us>
 # Created:    2020/09/04 (YYYY/MM/DD)
-# Updated:    2020/09/04 (YYYY/MM/DD)
-# Notes:
+# Updated:    2020/09/05 (YYYY/MM/DD)
+# Notes:      NaH
 
 version: "3.7"
 
@@ -13,12 +13,9 @@ networks:
   internal:
     driver: overlay
     attachable: true
-    ipam:
-      config:
-        - subnet: 172.32.176.0/24
   # External Networking
   # All front-facing external services attach to this network!
-  traefik_public:
+  external:
     external: true
 
 ########################### SECRETS
@@ -39,74 +36,40 @@ services:
   jellyfin-windows:
     image: cameronkollwitz/jellyfin-windows:10.6.4
     deploy:
-      labels:
-        traefik.enable: "true"
-        traefik.docker.network: "traefik_public"
-        ## HTTP Routers
-        traefik.http.services.jellyfin.loadbalancer.server.port: "8096"
-        traefik.http.routers.jellyfin-rtr.rule: "Host(`jellyfin.DOMAIN.TLD`)"
-        ## HTTPS Services
-        traefik.http.routers.jellyfin-rtr.entrypoints: "https"
-        traefik.http.routers.jellyfin-rtr.tls.certresolver: "dns-cloudflare"
-        # SSL Certificates
-        traefik.http.routers.jellyfin-rtr.tls.domains[0].main: "*.DOMAIN.TLD"
-        traefik.http.routers.jellyfin-rtr.tls.domains[0].sans: "DOMAIN.TLD"
-        traefik.http.routers.jellyfin-rtr.tls.domains[1].main: "*.DOMAIN2.TLD"
-        traefik.http.routers.jellyfin-rtr.tls.domains[1].sans: "DOMAIN2.TLD"
-        ## HSTS Header Middleware
-        traefik.http.middlewares.jellyfin.headers.SSLRedirect: "true"
-        traefik.http.middlewares.jellyfin.headers.STSSeconds: "315360000"
-        traefik.http.middlewares.jellyfin.headers.browserXSSFilter: "true"
-        traefik.http.middlewares.jellyfin.headers.contentTypeNosniff: "true"
-        traefik.http.middlewares.jellyfin.headers.forceSTSHeader: "true"
-        traefik.http.middlewares.jellyfin.headers.SSLHost: ""
-        traefik.http.middlewares.jellyfin.headers.STSIncludeSubdomains: "true"
-        traefik.http.middlewares.jellyfin.headers.STSPreload: "true"
-        traefik.http.middlewares.jellyfin.headers.frameDeny: "true"
-        ## Middleware Chains
-        #traefik.http.routers.jellyfin-rtr.middlewares: "chain-authelia@file" # Authelia
-        #traefik.http.routers.jellyfin-rtr.middlewares: "chain-basic-auth@file" # .htpasswd Authentication
-        traefik.http.routers.jellyfin-rtr.middlewares: "chain-no-auth@file" # No Authentication
-        #traefik.http.routers.jellyfin-rtr.middlewares: "chain-oauth@file" # Traefik-Forward-Auth
       placement:
         # Restrict placement of the service to Windows nodes only
         constraints: [node.platform.os == windows]
       restart_policy:
         condition: any
     environment:
-      JELLYFIN_PublishedServerUrl: "http://jellyfin.DOMAIN.TLD"
-      PGID: "1000"
-      PUID: "1000"
+      JELLYFIN_PublishedServerUrl: "http://jellyfin.${DOMAIN}"
       TZ: "America/Los_Angeles"
-      UMASK_SET: "022" # umask setting of Emby, default if left unset is 022 (Optional)
     networks:
       internal:
-      traefik_public:
+      external:
     ports:
       - target: 8096
-        published: 38096
+        published: 8096
         protocol: tcp
-        mode: host # Host mode is REQUIRED if you plan on using DNLA
       - target: 8920
-        published: 38920
+        published: 8920
         protocol: tcp
-        mode: host # Host mode is REQUIRED if you plan on using DNLA
       - target: 1900
-        published: 31900
+        published: 1900
         protocol: udp
-        mode: host # Host mode is REQUIRED if you plan on using DNLA
       - target: 7359
-        published: 37359
+        published: 7359
         protocol: udp
-        mode: host # Host mode is REQUIRED if you plan on using DNLA
-    #volumes:
-      #- type: bind
-      #  source: c:/path/to/config
-      #  target: c:/jellyfin/config
-      #- type: bind
-      #  source: c:/jellyfin/cache
-      #  target: /cache # This is where all the metadata like thumbnails lives!
-      # Media Pool
+    volumes:
+      - type: volume
+        source: AppData
+        target: C:\Jellyfin\AppData
+      - type: volume
+        source: Scripts
+        target: C:\Scripts
+      - type: volume
+        source: Temp
+        target: C:\Temp
       #- type: volume
-      #  source: media
-      #  target: /media
+      #  source: Media
+      #  target: C:\Media
