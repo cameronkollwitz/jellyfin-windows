@@ -23,7 +23,7 @@ EXPOSE 8096/tcp 8920/tcp 1900/udp
 #EXPOSE 7359/udp
 
 # Define Docker Volumes
-VOLUME [ "C:/Jellyfin/AppData"]
+#VOLUME [ "C:/Jellyfin/AppData"]
 VOLUME [ "C:/Users/ContainerAdministrator/AppData/Local/jellyfin" ]
 
 # Set working directory
